@@ -1,4 +1,4 @@
-package com.fire_native_chatapp.newarchitecture.modules;
+package com.company.fire_native_chatApp.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

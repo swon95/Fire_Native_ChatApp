@@ -1,4 +1,4 @@
-package com.fire_native_chatapp;
+package com.company.fire_native_chatApp;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

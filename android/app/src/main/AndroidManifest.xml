@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.fire_native_chatapp">
+  package="com.company.fire_native_chatApp">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
