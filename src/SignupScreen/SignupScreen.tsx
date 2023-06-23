@@ -201,7 +201,9 @@ const SignupScreen = () => {
           <View>
             <TouchableOpacity
               style={signupButtonStyle}
-              onPress={onPressSignupButton}>
+              onPress={onPressSignupButton}
+              // 에러가 있을 경우 버튼 비활성화를 위해 disabled
+              disabled={!signupButtonEnabled}>
               <Text style={styles.signupButtonText}>회원 가입</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -231,6 +233,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: Colors.BLACK
   },
   input: {
     marginTop: 10,
