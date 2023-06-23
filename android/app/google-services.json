@@ -1,42 +1,34 @@
 {
   "project_info": {
-    "project_number": "955869530712",
-    "firebase_url": "https://fire-nateve-chat-default-rtdb.firebaseio.com",
-    "project_id": "fire-nateve-chat",
-    "storage_bucket": "fire-nateve-chat.appspot.com"
+    "project_number": "648991310173",
+    "project_id": "fire-nateve-chat-12f80",
+    "storage_bucket": "fire-nateve-chat-12f80.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:955869530712:android:bcd86e043359e0eea2582d",
+        "mobilesdk_app_id": "1:648991310173:android:e6c7b978e332d2fa27a8b4",
         "android_client_info": {
-          "package_name": "com.company.fire_native_chatApp"
+          "package_name": "com.firenative.chatapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "955869530712-tfouk2v6ea7ju409bslatclvnf501ef8.apps.googleusercontent.com",
+          "client_id": "648991310173-mj8pmtigk2hi41i6hi62jehmcgg6ufo5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCkwMXrzhL1cA02kJC969qNwRiskfwo9-8"
+          "current_key": "AIzaSyBXV0DL9xZnqXd9FTl6vDhaymBDAC9x-wE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "955869530712-j5mu5t68d9r1s41mvecshh8p211c7grj.apps.googleusercontent.com",
+              "client_id": "648991310173-mj8pmtigk2hi41i6hi62jehmcgg6ufo5.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "955869530712-pcelsufp3ln6d8gjbp3o6ubdtgv8k1lb.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.anonymous.Fire-Native-ChatApp"
-              }
             }
           ]
         }

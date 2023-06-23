@@ -16,7 +16,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Firebase에서 반환되는 User 객체의 타입은 firebase.User이므로,
     // firebaseUser 인자의 타입을 firebase.User | null로 명시
-    const unsubsribe = auth().onAuthStateChanged(async fbUser => {
+    const unsubsribe = auth().onUserChanged(async fbUser => {
       // 로그인 된 경우 == null
       if (fbUser != null) {
         setUser({
@@ -60,9 +60,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email,
             name,
           });
-        // 코드가 실행에 성공해도 실패해도 false
-      } catch (error) {
-        console.log(error);
+      //   // 코드가 실행에 성공해도 실패해도 false
+      // } catch (error) {
+      //   console.log(error);
       } finally {
         // 회원가입이 끝나면 false 로 종료
         setProcessingSignup(false);

@@ -189,7 +189,7 @@ const SignupScreen = () => {
               value={name}
               style={styles.input}
               // 입력한 비밀번호 숨김처리
-              secureTextEntry
+              // secureTextEntry
               onChangeText={onChangeNameText}
             />
             {nameErrorText && (
