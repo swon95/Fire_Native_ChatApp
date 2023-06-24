@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import Colors from '../modules/Colors';
 import AuthContext from '../components/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../types';
 
 const SignupScreen = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +23,8 @@ const SignupScreen = () => {
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [name, setName] = useState('');
   const { processingSignup, signup } = useContext(AuthContext);
+
+  const {navigate} = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   // useMemo == 연산 결과를 저장하여 값이 변경되지 않을경우 이전 결과를 재사용하는 Hooks
   const emailErrorText = useMemo(() => {
@@ -129,7 +134,9 @@ const SignupScreen = () => {
     }
   }, [signup, email, password, name]);
 
-  const onPressSigninButton = useCallback(() => {}, []);
+  const onPressSigninButton = useCallback(() => {
+    navigate('Signin')
+  }, [navigate]);
 
   return (
     <Screen title="회원가입">

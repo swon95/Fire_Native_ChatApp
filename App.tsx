@@ -13,6 +13,7 @@ import React from 'react';
 import { RootStackParamList } from './src/types';
 import SignupScreen from './src/SignupScreen/SignupScreen';
 import AuthProvider from './src/components/AuthProvider';
+import SigninScreen from './src/SigninScreen/SigninScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -22,6 +23,7 @@ const Screens = () => {
       {/* 공통된 header 를 구성하기 위해 shown -> false */}
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Signin" component={SigninScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
