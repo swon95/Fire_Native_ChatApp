@@ -12,6 +12,9 @@ export interface AuthContextProp {
   signup: (email: string, password: string, name: string) => Promise<void>;
   // signup 이 Promise(비동기 함수) 이므로 processingSignup 이 진행중일경우 true 끝날 경우 false
   processingSignup: boolean;
+  signin: (email: string, password: string) => Promise<void>;
+  // 로그인이 진행되는동안 상태를 표시해주기 위한 processingSignin => 진행중일경우 true 끝날 경우 false
+  processingSignin: boolean;
 }
 
 const AuthContext = createContext<AuthContextProp>({
@@ -19,6 +22,8 @@ const AuthContext = createContext<AuthContextProp>({
   user: null,
   signup: async () => {},
   processingSignup: false,
+  signin: async () => {},
+  processingSignin: false,
 });
 
 export default AuthContext;
