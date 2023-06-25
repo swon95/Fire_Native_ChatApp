@@ -136,6 +136,8 @@ const SignupScreen = () => {
 
   const onPressSigninButton = useCallback(() => {
     navigate('Signin')
+    // Dependency => navigate
+    // Dependency ? 파라미터나 리턴값 또는 지역변수 등으로 다른 객체를 참조함을 의미
   }, [navigate]);
 
   return (

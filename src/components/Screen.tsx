@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import Colors from '../modules/Colors';
+import { useNavigation } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   container: {
@@ -13,6 +14,8 @@ const styles = StyleSheet.create({
   left: {
     flex: 1,
     // backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   center: {
     flex: 3,
@@ -31,6 +34,10 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
   },
+  backButtonText: {
+    fontSize: 12,
+    color: Colors.BLACK,
+  }
 });
 
 interface ScreenProps {
@@ -41,10 +48,25 @@ interface ScreenProps {
 }
 
 const Screen = ({ title, children }: ScreenProps) => {
+  
+  // goBack 메서드를 통해 이전화면으로 돌아가기
+  // canGoBack 메서드를 통해 이전화면으로 돌아갈 수 있는지의 유무를 판별
+  const {goBack, canGoBack} = useNavigation()
+
+  const onPressBackButton = useCallback(() => {
+    goBack()
+  }, [goBack])
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.left} />
+        <View style={styles.left}>
+          {/* 회원가입 페이지에서는 더 이상 뒤로 갈 화면이 없기 때문에 Back 버튼이 보이지 않음 ! */}
+          {canGoBack() && (
+            <TouchableOpacity onPress={onPressBackButton}>
+            <Text style={styles.backButtonText}>{'Back'}</Text>
+          </TouchableOpacity>
+          )}
+        </View>
         <View style={styles.center}>
           <Text style={styles.headerTitle}>{title}</Text>
         </View>
