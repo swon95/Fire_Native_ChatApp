@@ -1,11 +1,18 @@
-import React, {useContext, useCallback} from 'react';
+import React, {useContext, useCallback, useState, useEffect} from 'react';
 import Screen from '../components/Screen';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import AuthContext from '../components/AuthContext';
 import Colors from '../modules/Colors';
+import {Collections, User} from '../types';
 
 const HomeScreen = () => {
+  // firestore 에 저장되어있는 다른 사용자의 정보를 가져오는 State
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  // 저장된 사용자들의 정보를 배열로 담아두는 State
+  const [users, setUsers] = useState<User[]>([]);
+  console.log(users);
   // 현재 user == null
   // 직관적으로 확인하기 위해 user 를 me 라는 변수에 담아줌 => 객체분해할당 (destructuring assignment)
   const {user: me} = useContext(AuthContext);
@@ -18,6 +25,28 @@ const HomeScreen = () => {
     // auth 에서 제공하는 signOut 함수
     auth().signOut();
   }, []);
+
+  const otherUsers = useCallback(async () => {
+    try {
+      setLoadingUsers(true);
+      // firestore 의 users Collection 에 담긴 모든 문서를 가져오기
+      const snapshot = await firestore().collection(Collections.USERS).get();
+      // 각각의 문서
+      setUsers(
+        snapshot.docs
+          .map(doc => doc.data() as User)
+          // filter 함수를 통해 들어온 유저의 아이디가 내 정보와 다른 것만 화면에 출력되게 조건 부여
+          .filter(u => u.userId !== me?.userId),
+      );
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, [me?.userId]);
+
+  useEffect(() => {
+    otherUsers();
+  }, [otherUsers]);
+
   return (
     <Screen title="홈">
       <View style={styles.container}>
