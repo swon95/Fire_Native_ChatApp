@@ -2,7 +2,14 @@ import React, {useContext, useCallback, useState, useEffect} from 'react';
 import Screen from '../components/Screen';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+} from 'react-native';
 import AuthContext from '../components/AuthContext';
 import Colors from '../modules/Colors';
 import {Collections, User} from '../types';
@@ -47,6 +54,15 @@ const HomeScreen = () => {
     otherUsers();
   }, [otherUsers]);
 
+  const renderLoading = useCallback(() => {
+    return (
+      <View style={styles.loadingContainer}>
+        {/* 자체제공 로딩 컴포넌트 */}
+        <ActivityIndicator />
+      </View>
+    );
+  }, []);
+
   return (
     <Screen title="홈">
       <View style={styles.container}>
@@ -61,6 +77,45 @@ const HomeScreen = () => {
               <Text style={styles.logoutText}>로그아웃</Text>
             </TouchableOpacity>
           </View>
+        </View>
+        <View style={styles.userListSection}>
+          {/* loadingUsers 가 있다면 renderLoading 함수를 불러오고, 그게 아니라면 FlatList 출력 */}
+          {loadingUsers ? (
+            renderLoading()
+          ) : (
+            <>
+              <Text style={styles.SectionTitle}>
+                다른 사용자와 대화해보세요 !
+              </Text>
+              <FlatList
+                style={styles.userList}
+                // data={[]} // 데이터(다른 유저정보)가 비어있는경우
+                data={users}
+                // renderItem 함수가 없으면 FlatList 는 에러 발생
+                // renderItem => 각각의 Item 을 그려주는 함수
+                // item 을 Object 로 불러오면 data 의 element 가 순차대로 들어옴
+                renderItem={(
+                  {item: user}, // item 의 이름을 user 로 변경
+                ) => (
+                  // 채팅창으로 이동하기 위해 TouchableOpacity
+                  <TouchableOpacity
+                    style={styles.userListItem}
+                    onPress={() => {}}>
+                    <Text style={styles.otherNameText}>{user.name}</Text>
+                    <Text style={styles.otherEmailText}>{user.email}</Text>
+                  </TouchableOpacity>
+                )}
+                // FlatList 간의 간격을 적용하는 메소드
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+                // 데이터가 비어있을 경우 출력하는 메소드
+                ListEmptyComponent={() => {
+                  return (
+                    <Text style={styles.emptyText}>사용자가 없습니다.</Text>
+                  );
+                }}
+              />
+            </>
+          )}
         </View>
       </View>
     </Screen>
@@ -105,5 +160,39 @@ const styles = StyleSheet.create({
   logoutText: {
     color: Colors.WHITE,
     fontSize: 14,
+  },
+  userListSection: {
+    flex: 1,
+    marginTop: 40,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userList: {
+    // backgroundColor: 'red'
+    flex: 1,
+  },
+  userListItem: {
+    backgroundColor: Colors.RIGHT_GRAY,
+    borderRadius: 12,
+    padding: 20,
+  },
+  otherNameText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.BLACK,
+  },
+  otherEmailText: {
+    marginTop: 4,
+    fontSize: 14,
+    color: Colors.BLACK,
+  },
+  separator: {
+    height: 10,
+  },
+  emptyText: {
+    color: Colors.BLACK,
   },
 });
