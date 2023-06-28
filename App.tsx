@@ -17,6 +17,7 @@ import SigninScreen from './src/SigninScreen/SigninScreen';
 import AuthContext from './src/components/AuthContext';
 import HomeScreen from './src/HomeScreen/HomeScreen';
 import LoadingScreen from './src/LoadingScreen/LoadingScreen';
+import ChatScreen from './src/ChatScreen/ChatScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,7 +33,12 @@ const Screens = () => {
     // user 가 빈 값이 아니고, 로그인, 회원가입이 진행되는 상태가 아닐경우 => Home Page 를 보여줌 => 로그인이 완료된 상태
     if (user != null && !processingSignin && !processingSignup) {
       // 로그인이 되었다면 보여줄 Stack
-      return <Stack.Screen name="Home" component={HomeScreen} />;
+      return (
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Chat" component={ChatScreen} />
+        </>
+      );
     }
     // 그게 아니라면 => 로그아웃
 

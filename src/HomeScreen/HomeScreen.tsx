@@ -12,7 +12,9 @@ import {
 } from 'react-native';
 import AuthContext from '../components/AuthContext';
 import Colors from '../modules/Colors';
-import {Collections, User} from '../types';
+import {Collections, RootStackParamList, User} from '../types';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const HomeScreen = () => {
   // firestore 에 저장되어있는 다른 사용자의 정보를 가져오는 State
@@ -20,6 +22,11 @@ const HomeScreen = () => {
   // 저장된 사용자들의 정보를 배열로 담아두는 State
   const [users, setUsers] = useState<User[]>([]);
   console.log(users);
+
+  // onPress => ChatScreen 으로 이동하기 위한 훅
+  const {navigate} =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   // 현재 user == null
   // 직관적으로 확인하기 위해 user 를 me 라는 변수에 담아줌 => 객체분해할당 (destructuring assignment)
   const {user: me} = useContext(AuthContext);
@@ -100,7 +107,13 @@ const HomeScreen = () => {
                   // 채팅창으로 이동하기 위해 TouchableOpacity
                   <TouchableOpacity
                     style={styles.userListItem}
-                    onPress={() => {}}>
+                    onPress={() => {
+                      // 각각의 유저들만의 채팅창 구현을 위해 파라미터를 넘겨줌 => 타입으로 userId, other 지정
+                      navigate('Chat', {
+                        userIds: [me.userId, user.userId],
+                        other: user,
+                      });
+                    }}>
                     <Text style={styles.otherNameText}>{user.name}</Text>
                     <Text style={styles.otherEmailText}>{user.email}</Text>
                   </TouchableOpacity>
@@ -175,7 +188,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userListItem: {
-    backgroundColor: Colors.RIGHT_GRAY,
+    backgroundColor: Colors.LIGHT_GRAY,
     borderRadius: 12,
     padding: 20,
   },
