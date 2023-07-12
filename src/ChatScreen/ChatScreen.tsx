@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {RootStackParamList} from '../types';
 import useChat from './useChat';
@@ -76,7 +77,9 @@ const ChatScreen = () => {
             style={sendDisabled ? disabledSendButtonStyle : styles.sendButton}
             disabled={sendDisabled}
             onPress={onPressSendButton}>
-            <Text style={styles.sendText}>Send</Text>
+            {/* <Text style={styles.sendText}>Send</Text> */}
+            {/* icon name 에는 _ 사용 시 icon 을 불러올 수 없음 */}
+            <Icon style={styles.sendIcon} name="outgoing-mail" />
           </TouchableOpacity>
         </View>
       </View>
@@ -170,7 +173,11 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50 / 2,
   },
-  sendText: {
+  // sendText: {
+  //   color: Colors.WHITE,
+  // },
+  sendIcon: {
     color: Colors.WHITE,
+    fontSize: 24,
   },
 });
