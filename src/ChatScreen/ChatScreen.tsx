@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
 import Screen from '../components/Screen';
 import {
   StyleSheet,
@@ -14,6 +14,7 @@ import {RouteProp, useRoute} from '@react-navigation/native';
 import {RootStackParamList} from '../types';
 import useChat from './useChat';
 import Colors from './../modules/Colors';
+import AuthContext from '../components/AuthContext';
 
 const ChatScreen = () => {
   // HomeScreen 에서 넘겨준 파라미터를 받아옴
@@ -21,10 +22,14 @@ const ChatScreen = () => {
   // 다른 사용자 정보를 클릭 시 Title 에 userId 출력
   const {other, userIds} = params;
   // Custom Hook mount -> 채팅방 접근 -> firestore 에 chats Collection 생성
-  const {chat, loadingChat} = useChat(userIds);
+  // sendMessage props
+  const {chat, loadingChat, sendMessage} = useChat(userIds);
 
   // 텍스트를 입력받는 State
   const [text, setText] = useState('');
+
+  // 내 정보 가져오기
+  const {user: me} = useContext(AuthContext);
 
   const onChangeText = useCallback((newText: string) => {
     setText(newText);
@@ -39,8 +44,12 @@ const ChatScreen = () => {
 
   const onPressSendButton = useCallback(() => {
     // TODO: send text message
-    setText(''); // 텍스트를 입력 후 버튼을 누르면 input area 초기화
-  }, []);
+    // me 가 null 일 때만 메세지 전송
+    if (me != null) {
+      sendMessage(text, me);
+      setText(''); // 텍스트를 입력 후 버튼을 누르면 input area 초기화
+    }
+  }, [me, sendMessage, text]);
 
   const renderChat = useCallback(() => {
     if (chat == null) {

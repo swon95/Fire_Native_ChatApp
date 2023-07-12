@@ -3,7 +3,7 @@
 // 있으면 불러오고, 없으면 생성해줌
 
 import React, {useState, useCallback, useEffect} from 'react'
-import { Chat, Collections, User } from './../types'
+import { Chat, Collections, Message, User, FirestoreMessageData } from './../types'
 import firestore from '@react-native-firebase/firestore'
 import _ from 'lodash'
 
@@ -17,7 +17,10 @@ const useChat = (userIds: string[]) => {
     const [chat, setChat] = useState<Chat | null>(null)
     // 채팅방의 로딩을 담당하는 State
     const [loadingChat, setLoadingChat] = useState(false)
-
+    // 메세지를 보내는 State
+    const [messages, setMessages] = useState<Message []>([])
+    // 메세지를 보내는 상태를 나타내는 State
+    const [sending, setSending] = useState(false)
     
     // 채팅방을 생성하는 함수
     const loadChat = useCallback( async () => {
@@ -75,8 +78,48 @@ const useChat = (userIds: string[]) => {
     useEffect(() => {
         loadChat()
     }, [loadChat])
+
+    // 비동기처리
+    const sendMessage = useCallback(async (
+        // 메세지의 형태
+        text: string,
+        // 메세지를 보낸 유저정보
+        user: User
+    ) => {
+        // chat.id 가 null 일 경우 에러 메세지 출력
+        if (chat?.id == null) {
+            throw new Error('Chat is not loaded')
+        }
+        try {
+            setSending(true)
+            // 데이터를 저장하는 형태 => firestore
+            const data: FirestoreMessageData = {
+                text: text,
+                user: user,
+                createAt: new Date(),
+            }
+            const doc = await firestore()
+                // firestore 의 CHATS Collection 에 접근
+                .collection(Collections.CHATS)
+                // 몇번째 message 의 문서인지 id 를 통해 확인
+                .doc(chat.id)
+                // 생성한 MESSAGE Collection 에 접근
+                .collection(Collections.MESSAGES)
+                // data 를 추가
+                .add(data)
+            
+            // 이전 메세지 가져와 해당 data 를 추가
+            setMessages(prevMessages => prevMessages.concat([{
+                id: doc.id,
+                ...data
+            }]))
+        
+        } finally {
+            setSending(false)
+        }
+    }, [chat?.id])
     return {
-        chat, loadingChat,
+        chat, loadingChat, sendMessage, messages, sending
     }
 }
 
