@@ -23,7 +23,11 @@ const ChatScreen = () => {
   const {other, userIds} = params;
   // Custom Hook mount -> 채팅방 접근 -> firestore 에 chats Collection 생성
   // sendMessage props
-  const {chat, loadingChat, sendMessage} = useChat(userIds);
+  const {chat, loadingChat, sendMessage, messages, loadingMessages} =
+    useChat(userIds);
+
+  // console.log('messages', messages);
+  const loading = loadingChat || loadingMessages;
 
   // 텍스트를 입력받는 State
   const [text, setText] = useState('');
@@ -71,7 +75,19 @@ const ChatScreen = () => {
             horizontal
           />
         </View>
-        <View style={styles.messageList} />
+        <FlatList
+          style={styles.messageList}
+          data={messages}
+          renderItem={({item: message}) => {
+            return (
+              <View>
+                <Text>{message.user.name}</Text>
+                <Text>{message.text}</Text>
+                <Text>{message.createAt.toISOString()}</Text>
+              </View>
+            );
+          }}
+        />
         <View style={styles.inputContainer}>
           <View style={styles.textInputContainer}>
             <TextInput
@@ -94,13 +110,14 @@ const ChatScreen = () => {
       </View>
     );
     // dependencies array 추가
-  }, [chat, text, onChangeText, sendDisabled, onPressSendButton]);
+  }, [chat, text, onChangeText, sendDisabled, onPressSendButton, messages]);
 
   return (
     <Screen title={other.name}>
       <View style={styles.container}>
         {/* 채팅방이 이미 존재한다면 불러오는 시간동안 로딩스피너 보여주기 */}
-        {loadingChat ? (
+        {/* loadingChat => loading */}
+        {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator />
           </View>

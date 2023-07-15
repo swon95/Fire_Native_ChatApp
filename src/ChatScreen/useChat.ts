@@ -21,6 +21,8 @@ const useChat = (userIds: string[]) => {
     const [messages, setMessages] = useState<Message []>([])
     // 메세지를 보내는 상태를 나타내는 State
     const [sending, setSending] = useState(false)
+    // 메세지를 불러/가져오는 상태를 나타내는 State
+    const [loadingMessages, setLoadingMessages] = useState(false)
     
     // 채팅방을 생성하는 함수
     const loadChat = useCallback( async () => {
@@ -103,7 +105,7 @@ const useChat = (userIds: string[]) => {
                 .collection(Collections.CHATS)
                 // 몇번째 message 의 문서인지 id 를 통해 확인
                 .doc(chat.id)
-                // 생성한 MESSAGE Collection 에 접근
+                // Collection 에 MESSAGES 불러오기
                 .collection(Collections.MESSAGES)
                 // data 를 추가
                 .add(data)
@@ -117,9 +119,53 @@ const useChat = (userIds: string[]) => {
         } finally {
             setSending(false)
         }
-    }, [chat?.id])
+    }, [chat?.id],
+    )
+    
+    // 어떤 채팅방인지를 확인하여 가져오기 위해 type 지정
+    const loadMessages = useCallback(async (chatId: string) => {
+        try{
+            // false => true 
+            setLoadingMessages(true)
+            // 보낸 메세지를 읽어오기 위해 firestore 의 collection 접근
+            const messagesSnapshot = await firestore()
+            .collection(Collections.CHATS)
+            .doc(chatId)
+            .collection(Collections.MESSAGES)
+            // 메세지를 보낸 순으로 정렬 => 오름차순 (asc)
+            .orderBy('createAt', 'asc')
+            // 가져오기
+            .get()
+
+            // messagesSnapshot 에 담긴 각각의 document 를 message Object 로 변환하여 messages State 에 담아줌
+            const ms = messagesSnapshot.docs.map<Message>(doc => {
+                // 문서의 내용이 변수 data (object)에 담김
+                const data = doc.data()
+                return {
+                    id: doc.id,
+                    user: data.user,
+                    text: data.text,
+                    // firestore 에 timestamp 타입이 존재하기에 일반 datetime 으로 변환해주기 위해 toDate 메소드 사용
+                    createAt: data.createAt.toDate()
+                }
+            })
+            setMessages(ms)
+        } finally {
+            setLoadingMessages(false)
+        }
+    }, [])
+
+    // useChat 이 import 되면 실행
+    useEffect(() => {
+        // chat 이 null 이 아닐 때 => chat 에 무언가의 정보가 들어있을 때
+        if (chat?.id != null) {
+            // load
+            loadMessages(chat.id)
+        }
+    }, [chat?.id, loadMessages])
+
     return {
-        chat, loadingChat, sendMessage, messages, sending
+        chat, loadingChat, sendMessage, messages, sending, loadingMessages
     }
 }
 
