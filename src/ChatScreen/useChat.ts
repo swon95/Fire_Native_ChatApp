@@ -110,12 +110,16 @@ const useChat = (userIds: string[]) => {
                 // data 를 추가
                 .add(data)
             
-            // 이전 메세지 가져와 해당 data 를 추가
-            setMessages(prevMessages => prevMessages.concat([{
-                id: doc.id,
-                ...data
-            }]))
-        
+            // 이전 메세지 가져와 해당 data 를 추가하는 영역
+            setMessages(prevMessages => 
+               [
+                // 추가되는 데이터
+                {
+                  id: doc.id,
+                  ...data
+                },
+               ].concat(prevMessages), // 이전 메세지
+            )
         } finally {
             setSending(false)
         }
@@ -132,8 +136,8 @@ const useChat = (userIds: string[]) => {
             .collection(Collections.CHATS)
             .doc(chatId)
             .collection(Collections.MESSAGES)
-            // 메세지를 보낸 순으로 정렬 => 오름차순 (asc)
-            .orderBy('createAt', 'asc')
+            // 메세지를 보낸 순으로 정렬 => 오름차순 (asc) => 내림차순(desc)
+            .orderBy('createAt', 'desc')
             // 가져오기
             .get()
 

@@ -76,6 +76,8 @@ const ChatScreen = () => {
           />
         </View>
         <FlatList
+          // FlatList 를 뒤집기 옵션 => inverted
+          inverted
           style={styles.messageList}
           data={messages}
           renderItem={({item: message}) => {
