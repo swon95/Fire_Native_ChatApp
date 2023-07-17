@@ -57,8 +57,8 @@ const Screens = () => {
       {/* 공통된 header 를 구성하기 위해 shown -> false */}
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {renderRootStack()}
-        {/* <Stack.Screen name="Signup" component={SignupScreen} />
-        <Stack.Screen name="Signin" component={SigninScreen} /> */}
+        {/* <Stack.Screen name="Signup" component={SignupScreen} /> */}
+        {/* <Stack.Screen name="Signin" component={SigninScreen} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -15,6 +15,7 @@ import {RootStackParamList} from '../types';
 import useChat from './useChat';
 import Colors from './../modules/Colors';
 import AuthContext from '../components/AuthContext';
+import Message from './Message';
 
 const ChatScreen = () => {
   // HomeScreen 에서 넘겨준 파라미터를 받아옴
@@ -82,13 +83,18 @@ const ChatScreen = () => {
           data={messages}
           renderItem={({item: message}) => {
             return (
-              <View>
-                <Text>{message.user.name}</Text>
-                <Text>{message.text}</Text>
-                <Text>{message.createAt.toISOString()}</Text>
-              </View>
+              <Message
+                name={message.user.name}
+                text={message.text}
+                createAt={message.createAt}
+                // 내 userId(정보)와 다를 경우 상대방이 보낸 메세지로 판별
+                isOtherMessage={message.user.userId !== me?.userId}
+              />
             );
           }}
+          ItemSeparatorComponent={() => (
+            <View style={styles.messageSeparator} />
+          )}
         />
         <View style={styles.inputContainer}>
           <View style={styles.textInputContainer}>
@@ -112,7 +118,15 @@ const ChatScreen = () => {
       </View>
     );
     // dependencies array 추가
-  }, [chat, text, onChangeText, sendDisabled, onPressSendButton, messages]);
+  }, [
+    chat,
+    text,
+    onChangeText,
+    sendDisabled,
+    onPressSendButton,
+    messages,
+    me?.userId,
+  ]);
 
   return (
     <Screen title={other.name}>
@@ -171,6 +185,8 @@ const styles = StyleSheet.create({
   messageList: {
     flex: 1,
     // backgroundColor: 'red',
+    // margin 의 간격을 위아래로 지정
+    marginVertical: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -207,5 +223,8 @@ const styles = StyleSheet.create({
   sendIcon: {
     color: Colors.WHITE,
     fontSize: 24,
+  },
+  messageSeparator: {
+    height: 8,
   },
 });
