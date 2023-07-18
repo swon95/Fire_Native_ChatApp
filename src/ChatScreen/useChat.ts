@@ -78,7 +78,11 @@ const useChat = (userIds: string[]) => {
     // 새로운 메세지가 있을경우 messages State 에 추가
     const addNewMessages = useCallback((newMessages: Message[]) => {
         // 새로운 메세지를 이전 메세지 앞에 concat 메소드를 통해 붙여줌
-        setMessages(prevMessages => newMessages.concat(prevMessages))
+        setMessages(prevMessages => {
+            // lodash 의 uniqBy 함수를 사용하여
+            // 이전 메세지에 새로운 메세지를 추가하는 과정에서 발생하는 중복된 값들을 m (message) 의 id 기준으로 중복값 처리
+            return _.uniqBy(newMessages.concat(prevMessages), m => m.id) // m.id 가 같은 값 들은 addNewMessages 에서 제외
+        })
     }, [])
 
     // 해당 custom hook 이 마운트 되자마자 실행
@@ -115,78 +119,79 @@ const useChat = (userIds: string[]) => {
                 .collection(Collections.MESSAGES)
                 // data 를 추가
                 .add(data)
-            
-            // 이전 메세지 가져와 해당 data 를 추가하는 영역
-            setMessages(prevMessages => 
-               [
-                // 추가되는 데이터
-                {
-                  id: doc.id,
-                  ...data
-                },
-               ].concat(prevMessages), // 이전 메세지
-            )
+
+            addNewMessages([
+                  {
+                    // 추가되는 데이터
+                    id: doc.id,
+                    ...data
+                  },
+                ])
         } finally {
             setSending(false)
         }
-    }, [chat?.id],
+    }, [chat?.id, addNewMessages],
     )
     
-    // 어떤 채팅방인지를 확인하여 가져오기 위해 type 지정
-    const loadMessages = useCallback(async (chatId: string) => {
-        try{
-            // false => true 
-            setLoadingMessages(true)
-            // 보낸 메세지를 읽어오기 위해 firestore 의 collection 접근
-            const messagesSnapshot = await firestore()
-            .collection(Collections.CHATS)
-            .doc(chatId)
-            .collection(Collections.MESSAGES)
-            // 메세지를 보낸 순으로 정렬 => 오름차순 (asc) => 내림차순(desc)
-            .orderBy('createAt', 'desc')
-            // 가져오기
-            .get()
+    // // 어떤 채팅방인지를 확인하여 가져오기 위해 type 지정
+    // const loadMessages = useCallback(async (chatId: string) => {
+    //     try{
+    //         // false => true 
+    //         setLoadingMessages(true)
+    //         // 보낸 메세지를 읽어오기 위해 firestore 의 collection 접근
+    //         const messagesSnapshot = await firestore()
+    //         .collection(Collections.CHATS)
+    //         .doc(chatId)
+    //         .collection(Collections.MESSAGES)
+    //         // 메세지를 보낸 순으로 정렬 => 오름차순 (asc) => 내림차순(desc)
+    //         .orderBy('createAt', 'desc')
+    //         // 가져오기
+    //         .get()
 
-            // messagesSnapshot 에 담긴 각각의 document 를 message Object 로 변환하여 messages State 에 담아줌
-            const ms = messagesSnapshot.docs.map<Message>(doc => {
-                // 문서의 내용이 변수 data (object)에 담김
-                const data = doc.data()
-                return {
-                    id: doc.id,
-                    user: data.user,
-                    text: data.text,
-                    // firestore 에 timestamp 타입이 존재하기에 일반 datetime 으로 변환해주기 위해 toDate 메소드 사용
-                    createAt: data.createAt.toDate()
-                }
-            })
-            setMessages(ms)
-        } finally {
-            setLoadingMessages(false)
-        }
-    }, [])
+    //         // messagesSnapshot 에 담긴 각각의 document 를 message Object 로 변환하여 messages State 에 담아줌
+    //         const ms = messagesSnapshot.docs.map<Message>(doc => {
+    //             // 문서의 내용이 변수 data (object)에 담김
+    //             const data = doc.data()
+    //             return {
+    //                 id: doc.id,
+    //                 user: data.user,
+    //                 text: data.text,
+    //                 // firestore 에 timestamp 타입이 존재하기에 일반 datetime 으로 변환해주기 위해 toDate 메소드 사용
+    //                 createAt: data.createAt.toDate()
+    //             }
+    //         })
+    //         setMessages(ms)
+    //     } finally {
+    //         setLoadingMessages(false)
+    //     }
+    // }, [])
 
-    // useChat 이 import 되면 실행
-    useEffect(() => {
-        // chat 이 null 이 아닐 때 => chat 에 무언가의 정보가 들어있을 때
-        if (chat?.id != null) {
-            // load
-            loadMessages(chat.id)
-        }
-    }, [chat?.id, loadMessages])
+    // // 해당 부분은 onSnapshot 메소드의 역할과 동일하기에 제거
+    // // useChat 이 import 되면 실행
+    // useEffect(() => {
+    //     // chat 이 null 이 아닐 때 => chat 에 무언가의 정보가 들어있을 때
+    //     if (chat?.id != null) {
+    //         // load
+    //         loadMessages(chat.id)
+    //     }
+    // }, [chat?.id, loadMessages])
 
     useEffect(() => {
         // chat.id 가 null 이라면 반응 x
         if (chat?.id == null) {
             return
         }
-        firestore()
+        // false => true 
+        setLoadingMessages(true)
+
+        const unsubscribe = firestore()
             .collection(Collections.CHATS)
             // null 이 아닐경우
             .doc(chat.id)
             .collection(Collections.MESSAGES)
             .orderBy('createAt', 'desc')
             // onSnapshot firebase 메소드를 통해 update 시 마다 onSnapshot 메소드 호출
-            .onSnapshot((snapshot) => {
+            .onSnapshot((snapshot) => { // 
                 // newMessages 변수에 정의된 snapshot 에 
                 const newMessages = snapshot
                     // doc 에 (문서에) added (추가) 된 문서만 가져오기 
@@ -205,10 +210,16 @@ const useChat = (userIds: string[]) => {
                     }
                     return newMessage
                     })
-                    // 업데이트를 위한 함수
+                    // 업데이트를 위한 함수 => newMessages 함수로 인해 실시간으로 addNewMessages 업데이트
                     addNewMessages(newMessages)
+                    // true => false 됨으로 로딩스피너 제거
+                    setLoadingMessages(false)
                 })
-    }, [])
+                // useEffect 훅이 재실행되거나, 언마운트 시 실행 => 이벤트리스너 분리 !
+                return () => {
+                    unsubscribe()
+                }
+    }, [addNewMessages, chat?.id])
     return {
         chat, loadingChat, sendMessage, messages, sending, loadingMessages
     }
