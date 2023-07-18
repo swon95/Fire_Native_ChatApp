@@ -57,6 +57,8 @@ const HomeScreen = () => {
     }
   }, [me?.userId]);
 
+  const onPressProfile = useCallback(() => {}, []);
+
   useEffect(() => {
     otherUsers();
   }, [otherUsers]);
@@ -76,6 +78,7 @@ const HomeScreen = () => {
         <View>
           <Text style={styles.SectionTitle}>나의 정보</Text>
           <View style={styles.userSectionContent}>
+            <TouchableOpacity style={styles.profile} onPress={onPressProfile} />
             <View style={styles.myProfile}>
               <Text style={styles.myNameText}>{me.name}</Text>
               <Text style={styles.myEmailText}>{me.email}</Text>
@@ -207,5 +210,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: Colors.BLACK,
+  },
+  profile: {
+    width: 48,
+    height: 48,
+    borderRadius: 48 / 2,
+    backgroundColor: Colors.GRAY,
+    marginRight: 10,
   },
 });
