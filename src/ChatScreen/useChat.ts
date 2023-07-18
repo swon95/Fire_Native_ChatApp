@@ -75,6 +75,12 @@ const useChat = (userIds: string[]) => {
     }
     }, [userIds])
 
+    // 새로운 메세지가 있을경우 messages State 에 추가
+    const addNewMessages = useCallback((newMessages: Message[]) => {
+        // 새로운 메세지를 이전 메세지 앞에 concat 메소드를 통해 붙여줌
+        setMessages(prevMessages => newMessages.concat(prevMessages))
+    }, [])
+
     // 해당 custom hook 이 마운트 되자마자 실행
     // 즉, 다른 유저 정보를 클릭 하자마자 실행
     useEffect(() => {
@@ -168,6 +174,41 @@ const useChat = (userIds: string[]) => {
         }
     }, [chat?.id, loadMessages])
 
+    useEffect(() => {
+        // chat.id 가 null 이라면 반응 x
+        if (chat?.id == null) {
+            return
+        }
+        firestore()
+            .collection(Collections.CHATS)
+            // null 이 아닐경우
+            .doc(chat.id)
+            .collection(Collections.MESSAGES)
+            .orderBy('createAt', 'desc')
+            // onSnapshot firebase 메소드를 통해 update 시 마다 onSnapshot 메소드 호출
+            .onSnapshot((snapshot) => {
+                // newMessages 변수에 정의된 snapshot 에 
+                const newMessages = snapshot
+                    // doc 에 (문서에) added (추가) 된 문서만 가져오기 
+                    .docChanges().filter(({ type }) => type === 'added')
+                    .map(docChange => {
+                    // docChange 안에 {doc} 추가
+                    const {doc} = docChange
+                    // 데이터 가져오기
+                    const docData = doc.data()
+                    // 아래 메세지 타입으로 만들어 return
+                    const newMessage: Message = {
+                        id: doc.id,
+                        text: docData.text,
+                        user: docData.user,
+                        createAt: docData.createAt.toDate()
+                    }
+                    return newMessage
+                    })
+                    // 업데이트를 위한 함수
+                    addNewMessages(newMessages)
+                })
+    }, [])
     return {
         chat, loadingChat, sendMessage, messages, sending, loadingMessages
     }
