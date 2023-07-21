@@ -3,8 +3,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import {Collections, User} from '../types';
 import AuthContext from './AuthContext';
+import _ from 'lodash';
 
 const AuthProvider = ({children}: {children: React.ReactNode}) => {
   // 유저의 변경을 처리해주기 위한 state
@@ -27,6 +29,9 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
           userId: fbUser.uid,
           email: fbUser.email ?? '',
           name: fbUser.displayName ?? '',
+          // user 에 updateProfileImage 함수 실행
+          // => user 객체 정보를 불러와 photoURL 이 있는 경우 setUser 객체에 profileUrl 로 가져오기
+          profileUrl: fbUser.photoURL ?? '',
         });
         // 로그인이 되지 않은경우 == not null
       } else {
@@ -88,10 +93,35 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
     }
   }, []);
 
-  const updateProfileImage = useCallback(async (filepath: string) => {
-    // 이미지 업로드 => firebase.storage
-    // 프로필에 이미지 등록
-  }, []);
+  const updateProfileImage = useCallback(
+    async (filepath: string) => {
+      // 이미지 업로드 => firebase.storage
+      const filename = _.last(filepath.split('/')); // / 기호로 구분, lodash 의 last 메소드를 사용하여 경로 최 하단(마지막)의 아이템을 가져옴
+
+      // 잘못된경우
+      if (user == null) {
+        throw new Error('User is undefined');
+      }
+      // filename 의 값이 null 일 경우 Error 메세지 출력
+      if (filename == null) {
+        throw new Error('filename is undefined');
+      }
+      // 프로필에 이미지 등록 => users / userId / 경로에 filename 생성
+      const storageFilepath = `users/${user.userId}/${filename}`;
+      // ref == path , putFile == original filepath
+      await storage().ref(storageFilepath).putFile(filepath);
+      // storage 에서 download 가능한 URL 가져오기
+      const url = await storage().ref(storageFilepath).getDownloadURL();
+      // firebase user 에 등록 == update
+      await auth().currentUser?.updateProfile({photoURL: url});
+      // DB 에 저장
+      await firestore().collection(Collections.USERS).doc(user.userId).update({
+        profileUrl: url,
+      });
+    },
+    [user],
+  );
+
   // 자식 컴포넌트들에게 뿌려주기 위해 Provider
   const value = useMemo(() => {
     return {

@@ -13,6 +13,8 @@ export interface User {
     userId: string
     email: string
     name: string
+    // 처음 일 경우 null or undefined 일 수 있으니 ? 로 정의
+    profileUrl?: string
 }
 
 export enum Collections {
