@@ -15,6 +15,7 @@ import Colors from '../modules/Colors';
 import {Collections, RootStackParamList, User} from '../types';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import ImageCropPicker from 'react-native-image-crop-picker';
 
 const HomeScreen = () => {
   // firestore 에 저장되어있는 다른 사용자의 정보를 가져오는 State
@@ -57,11 +58,21 @@ const HomeScreen = () => {
     }
   }, [me?.userId]);
 
-  const onPressProfile = useCallback(() => {}, []);
-
   useEffect(() => {
     otherUsers();
   }, [otherUsers]);
+
+  const onPressProfile = useCallback(async () => {
+    try {
+      const image = await ImageCropPicker.openPicker({
+        cropping: true,
+        cropperCircleOverlay: true,
+      });
+      console.log('image', image);
+    } catch (error) {
+      console.error('Error selecting image:', error);
+    }
+  }, []);
 
   const renderLoading = useCallback(() => {
     return (

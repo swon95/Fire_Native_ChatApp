@@ -88,6 +88,10 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
     }
   }, []);
 
+  const updateProfileImage = useCallback(async (filepath: string) => {
+    // 이미지 업로드 => firebase.storage
+    // 프로필에 이미지 등록
+  }, []);
   // 자식 컴포넌트들에게 뿌려주기 위해 Provider
   const value = useMemo(() => {
     return {
@@ -97,8 +101,17 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
       processingSignup,
       signin,
       processingSignin,
+      updateProfileImage,
     };
-  }, [initialized, user, signup, processingSignup, signin, processingSignin]);
+  }, [
+    initialized,
+    user,
+    signup,
+    processingSignup,
+    signin,
+    processingSignin,
+    updateProfileImage,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

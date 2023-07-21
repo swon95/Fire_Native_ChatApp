@@ -1,6 +1,6 @@
 // Context Api == 명시적으로 컴포넌트에 props 를 전달하지 않아도 자식 컴포넌트들이 값을 공유할 수 있는 api
-import { createContext } from 'react';
-import { User } from '../types';
+import {createContext} from 'react';
+import {User} from '../types';
 
 // 타입 명시
 export interface AuthContextProp {
@@ -15,6 +15,8 @@ export interface AuthContextProp {
   signin: (email: string, password: string) => Promise<void>;
   // 로그인이 진행되는동안 상태를 표시해주기 위한 processingSignin => 진행중일경우 true 끝날 경우 false
   processingSignin: boolean;
+  // filepath 를 string 으로 받고 이미지를 업로드 시 updateProfileImage 를 통해 등록 가능
+  updateProfileImage: (filepath: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProp>({
@@ -24,6 +26,7 @@ const AuthContext = createContext<AuthContextProp>({
   processingSignup: false,
   signin: async () => {},
   processingSignin: false,
+  updateProfileImage: async () => {},
 });
 
 export default AuthContext;
