@@ -31,6 +31,7 @@ const AuthProvider = ({children}: {children: React.ReactNode}) => {
           name: fbUser.displayName ?? '',
           // user 에 updateProfileImage 함수 실행
           // => user 객체 정보를 불러와 photoURL 이 있는 경우 setUser 객체에 profileUrl 로 가져오기
+          // props -> homeScreen
           profileUrl: fbUser.photoURL ?? '',
         });
         // 로그인이 되지 않은경우 == not null

@@ -16,6 +16,7 @@ import {Collections, RootStackParamList, User} from '../types';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import Profile from './Profile';
 
 const HomeScreen = () => {
   // firestore 에 저장되어있는 다른 사용자의 정보를 가져오는 State
@@ -30,7 +31,7 @@ const HomeScreen = () => {
 
   // 현재 user == null
   // 직관적으로 확인하기 위해 user 를 me 라는 변수에 담아줌 => 객체분해할당 (destructuring assignment)
-  const {user: me} = useContext(AuthContext);
+  const {user: me, updateProfileImage} = useContext(AuthContext);
   // me 에 값이 비어있다면 잘못된것이므로 null return
   if (me == null) {
     return null;
@@ -62,17 +63,15 @@ const HomeScreen = () => {
     otherUsers();
   }, [otherUsers]);
 
+  // Profile 클릭 시 authProvider 에서 가져온 updateProfileImage 함수 실행 => filepath 는 image 의 path
   const onPressProfile = useCallback(async () => {
-    try {
-      const image = await ImageCropPicker.openPicker({
-        cropping: true,
-        cropperCircleOverlay: true,
-      });
-      console.log('image', image);
-    } catch (error) {
-      console.error('Error selecting image:', error);
-    }
-  }, []);
+    const image = await ImageCropPicker.openPicker({
+      cropping: true,
+      cropperCircleOverlay: true,
+    });
+    console.log('image', image);
+    await updateProfileImage(image.path);
+  }, [updateProfileImage]);
 
   const renderLoading = useCallback(() => {
     return (
@@ -89,7 +88,12 @@ const HomeScreen = () => {
         <View>
           <Text style={styles.SectionTitle}>나의 정보</Text>
           <View style={styles.userSectionContent}>
-            <TouchableOpacity style={styles.profile} onPress={onPressProfile} />
+            <Profile
+              style={styles.profile}
+              onPress={onPressProfile}
+              imageUrl={me.profileUrl}
+            />
+            {/* <TouchableOpacity style={styles.profile} onPress={onPressProfile} /> */}
             <View style={styles.myProfile}>
               <Text style={styles.myNameText}>{me.name}</Text>
               <Text style={styles.myEmailText}>{me.email}</Text>
@@ -223,10 +227,10 @@ const styles = StyleSheet.create({
     color: Colors.BLACK,
   },
   profile: {
-    width: 48,
-    height: 48,
-    borderRadius: 48 / 2,
-    backgroundColor: Colors.GRAY,
+    // width: 48,
+    // height: 48,
+    // borderRadius: 48 / 2,
+    // backgroundColor: Colors.GRAY,
     marginRight: 10,
   },
 });
