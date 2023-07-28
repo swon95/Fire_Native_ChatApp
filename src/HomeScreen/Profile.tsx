@@ -9,6 +9,8 @@ import {
   View,
   Image,
   ImageStyle,
+  TextStyle,
+  Text,
 } from 'react-native';
 import Colors from '../modules/Colors';
 
@@ -21,6 +23,8 @@ interface ProfileProps {
   // 프로필을 눌럿을때의 이벤트
   onPress?: () => void;
   imageUrl?: string;
+  text?: string;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 const Profile = ({
@@ -28,6 +32,8 @@ const Profile = ({
   style: containerStyleProp,
   onPress,
   imageUrl,
+  text,
+  textStyle,
 }: ProfileProps) => {
   const containerStyle = useMemo<StyleProp<ViewStyle>>(() => {
     return [
@@ -49,7 +55,13 @@ const Profile = ({
       {/* 프로필 영역을 그려주는 View */}
       <View style={containerStyle}>
         {/* imageUrl 이 있는 경우 Image 컴포넌트를 그려줌 */}
-        {imageUrl && <Image source={{uri: imageUrl}} style={imageStyle} />}
+        {/* {imageUrl && <Image source={{uri: imageUrl}} style={imageStyle} />} */}
+        {/* imageUrl 이 없는 경우 Text 컴포넌트를 그리고, 아무것도 없는 경우 null */}
+        {imageUrl ? (
+          <Image source={{uri: imageUrl}} style={imageStyle} />
+        ) : text ? (
+          <Text style={textStyle}>{text}</Text>
+        ) : null}
       </View>
     </TouchableOpacity>
   );

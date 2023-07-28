@@ -17,6 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import Profile from './Profile';
+import UserPhoto from '../components/UserPhoto';
 
 const HomeScreen = () => {
   // firestore 에 저장되어있는 다른 사용자의 정보를 가져오는 State
@@ -132,8 +133,15 @@ const HomeScreen = () => {
                         other: user,
                       });
                     }}>
-                    <Text style={styles.otherNameText}>{user.name}</Text>
-                    <Text style={styles.otherEmailText}>{user.email}</Text>
+                    <UserPhoto
+                      style={styles.userPhoto}
+                      imageUrl={user.profileUrl}
+                      name={user.name}
+                    />
+                    <View>
+                      <Text style={styles.otherNameText}>{user.name}</Text>
+                      <Text style={styles.otherEmailText}>{user.email}</Text>
+                    </View>
                   </TouchableOpacity>
                 )}
                 // FlatList 간의 간격을 적용하는 메소드
@@ -209,6 +217,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.LIGHT_GRAY,
     borderRadius: 12,
     padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   otherNameText: {
     fontSize: 16,
@@ -231,6 +241,9 @@ const styles = StyleSheet.create({
     // height: 48,
     // borderRadius: 48 / 2,
     // backgroundColor: Colors.GRAY,
+    marginRight: 10,
+  },
+  userPhoto: {
     marginRight: 10,
   },
 });
