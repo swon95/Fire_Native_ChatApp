@@ -24,7 +24,7 @@ const UserPhoto = ({
 
   const images = useMemo(
     // imageUrl 이 있는 경우 uri 에 imageUrl 을 넣어주고 없는 경우 빈 배열
-    () => (imageUrl != null ? [{url: imageUrl}] : []),
+    () => (imageUrl != null ? [{uri: imageUrl}] : []),
     [imageUrl],
   );
 
